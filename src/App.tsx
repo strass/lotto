@@ -1,26 +1,70 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { sample } from "lodash";
+import React, { useEffect, useState } from "react";
+import { useList } from "react-use";
+import data from "./service/data";
+import Spinner from "./Spinner";
+import { useSpring, animated } from "react-spring";
 
-function App() {
+const map = function (
+  value: number,
+  in_min: number,
+  in_max: number,
+  out_min: number,
+  out_max: number
+) {
+  if (value === 0) {
+    return out_min;
+  }
+  return ((value - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
+};
+
+const radius = 50;
+
+const App = () => {
+  const [list, { push }] = useList<string>(["", "", "", ""]);
+  const [power, setPower] = useState(0);
+  const [acc, setAcc] = useState(0);
+  const [props, set] = useSpring(() => ({
+    transform: "rotate(0deg)",
+    immediate: false,
+  }));
+
+  useEffect(() => {
+    const config = { mass: 50, tension: 200, friction: 200, precision: 0.001 };
+    set({
+      from: { transform: `rotate(${map(acc, 0, 100, 0, 1700)}deg)` },
+      transform: `rotate(${map(acc + power, 0, 100, 0, 1700)}deg)`,
+      immediate: false,
+      config,
+    });
+    setAcc((a) => a + power);
+  }, [power, set]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button
+        onClick={() => {
+          push(sample(data) ?? "");
+        }}
+      >
+        draw
+      </button>
+      <button
+        onClick={() => {
+          setPower((p) => p + 10);
+        }}
+      >
+        spin
+      </button>
+      <animated.svg
+        style={{ transformOrigin: "center", ...props }}
+        width={radius * 2}
+        height={radius * 2}
+      >
+        <Spinner segments={list} radius={radius} />
+      </animated.svg>
     </div>
   );
-}
+};
 
 export default App;
