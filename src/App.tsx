@@ -18,10 +18,10 @@ const map = function (
   return ((value - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
 };
 
-const radius = 50;
+const radius = 500;
 
 const App = () => {
-  const [list, { push }] = useList<string>(["", "", "", ""]);
+  const [list, { push }] = useList<string>(data);
   const [power, setPower] = useState(0);
   const [acc, setAcc] = useState(0);
   const [props, set] = useSpring(() => ({
@@ -38,6 +38,8 @@ const App = () => {
       config,
     });
     setAcc((a) => a + power);
+    // If acc is in here it never stops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [power, set]);
 
   return (

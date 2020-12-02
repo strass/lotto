@@ -17,17 +17,30 @@ const Spinner: FunctionComponent<{ segments: string[]; radius: number }> = ({
       const toCoordY = cy + r * Math.sin((toAngle * Math.PI) / 180);
       const d = `M${cx},${cy} L${fromCoordX},${fromCoordY} A${r},${r} 0 0,1 ${toCoordX},${toCoordY}z`;
       return (
-        <path
-          d={d}
-          stroke="black"
-          strokeWidth="1px"
-          fill="white"
-          key={idx}
-          style={{ zIndex: 1 }}
-        />
+        <g>
+          <text
+            y={r}
+            x={r / 4}
+            style={{
+              transform: `rotate(${(fromAngle + toAngle) / 2}deg)`,
+              zIndex: 2,
+              transformOrigin: "center",
+            }}
+          >
+            {segmentTitle}
+          </text>
+          <path
+            d={d}
+            stroke="black"
+            strokeWidth="1px"
+            fill="transparent"
+            key={idx}
+            style={{ zIndex: 1 }}
+          />
+        </g>
       );
     });
-  }, [segments]);
+  }, [segments, cx, cy, r]);
   return (
     <Fragment>
       <circle
