@@ -1,4 +1,3 @@
-import { sample } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useList } from "react-use";
 import data from "./service/data";
@@ -21,7 +20,7 @@ const map = function (
 const radius = 500;
 
 const App = () => {
-  const [list, { push }] = useList<string>(data);
+  const [list] = useList<string>(data);
   const [power, setPower] = useState(0);
   const acc = useRef(0);
   const [props, set] = useSpring(() => ({
