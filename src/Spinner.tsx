@@ -48,7 +48,8 @@ const Text: FunctionComponent<{
   fromAngle: number;
   toAngle: number;
   label: string;
-}> = ({ r, fromAngle: _fromAngle, toAngle: _toAngle, label }) => {
+  idx: number;
+}> = ({ r, fromAngle: _fromAngle, toAngle: _toAngle, label, idx }) => {
   const fromAngle = _fromAngle + 90;
   const toAngle = _toAngle + 90;
   return (
@@ -56,11 +57,11 @@ const Text: FunctionComponent<{
       y={r}
       x={r / 4}
       style={{
-        transform: `rotate(${(fromAngle + toAngle) / 2}deg)`,
+        transform: `rotate(${(fromAngle + toAngle) / 2 - 12}deg)`,
         transformOrigin: "center",
       }}
     >
-      {label}
+      {label} ({idx})
     </text>
   );
 };
@@ -87,6 +88,7 @@ const Spinner: FunctionComponent<{
       return {
         arcs: (
           <Segment
+            key={idx}
             currentRotation={rotation % 360}
             r={r}
             fromAngle={fromAngle}
@@ -99,6 +101,8 @@ const Spinner: FunctionComponent<{
         ),
         text: (
           <Text
+            key={idx}
+            idx={idx}
             r={r}
             fromAngle={fromAngle}
             toAngle={toAngle}
@@ -115,7 +119,7 @@ const Spinner: FunctionComponent<{
         return text;
       }),
     };
-  }, [segments, cx, cy, r, rotation]);
+  }, [segments, cx, cy, r, rotation, setSelectedChunk]);
   return (
     <svg width={r * 2} height={r * 2}>
       <animated.g style={{ transformOrigin: "center", ...spinAnimation }}>

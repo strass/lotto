@@ -29,9 +29,10 @@ const App = () => {
     chunks: [],
     activeSegments: [],
     activePrize: 0,
+    root: true,
   });
   useEffectOnce(() => {
-    dispatch({ type: "init", data, chunkNum: 50 });
+    dispatch({ type: "init", data, chunkNum: 40 });
   });
   const [power, setPower] = useState(0);
   const [rotation, setRotation] = useState(0);
@@ -75,14 +76,40 @@ const App = () => {
         >
           spin
         </button>
+        {state.root ? (
+          <button
+            disabled={spinning}
+            onClick={() => {
+              let chunkIndex =
+                (selectedChunk.current - 18) % state.activeSegments.length;
+              if (chunkIndex < 0) {
+                chunkIndex = state.activeSegments.length - Math.abs(chunkIndex);
+              }
+              console.log(selectedChunk.current, chunkIndex);
+              dispatch({
+                type: "advance",
+                chunkIndex,
+              });
+              setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
+            }}
+          >
+            advance
+          </button>
+        ) : (
+          <button>select winner</button>
+        )}
         <button
-          disabled={spinning}
           onClick={() => {
-            console.log(selectedChunk.current);
-            dispatch({ type: "advance", chunkIndex: selectedChunk.current });
+            dispatch({
+              type: "init",
+              chunkNum: 40,
+              // Do we need to remove winners?
+              data,
+            });
+            setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
           }}
         >
-          advance
+          reset
         </button>
         <Spinner
           segments={state.activeSegments}

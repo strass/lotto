@@ -9,6 +9,7 @@ export interface LottoState {
   chunks: typeof data[];
   activeSegments: ComponentProps<typeof Spinner>["segments"];
   activePrize: number;
+  root: boolean;
 }
 
 type Action = Record<string, unknown> & { type: string } & (
@@ -26,6 +27,13 @@ const reducer: Reducer<LottoState, Action> = (state, action) => {
         chunks,
         activeSegments: chunks.map((names) => `${first(names)}-${last(names)}`),
         activePrize: 0,
+        root: true,
+      };
+    case "advance":
+      return {
+        ...state,
+        activeSegments: state.chunks[action.chunkIndex],
+        root: false,
       };
     default:
       return state;
