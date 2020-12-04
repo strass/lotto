@@ -154,14 +154,15 @@ const App = () => {
         <h2>Prizes</h2>
         <ul>
           {state.prizes.map((p, idx) => (
-            <li
-              key={idx}
-              style={idx === state.activePrize ? { color: "red" } : undefined}
-              onClick={() => {
-                dispatch({ type: "setPrize", prizeIndex: idx });
-              }}
-            >
-              {p.label} {p.winner && `(${p.winner})`}{" "}
+            <li key={idx}>
+              <button
+                style={idx === state.activePrize ? { color: "red" } : undefined}
+                onClick={() => {
+                  dispatch({ type: "setPrize", prizeIndex: idx });
+                }}
+              >
+                {p.label} {p.winner && `(${p.winner})`}{" "}
+              </button>
             </li>
           ))}
         </ul>
