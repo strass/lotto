@@ -5,4 +5,4 @@ const fakeData = (num: number = 20) => {
   return times(num, () => faker.name.findName());
 };
 
-export default fakeData();
+export default fakeData(1000);
