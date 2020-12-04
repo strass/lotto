@@ -16,6 +16,7 @@ type Action = { type: string } & (
   | { type: "init"; data: LottoState["data"]; chunkNum: number }
   | { type: "advance"; chunkIndex: number }
   | { type: "winner"; nameIndex: number }
+  | { type: "setPrize"; prizeIndex: number }
 );
 
 const reducer: Reducer<LottoState, Action> = (state, action) => {
@@ -43,6 +44,11 @@ const reducer: Reducer<LottoState, Action> = (state, action) => {
           ...state.prizes[state.activePrize],
           winner: state.chunks[state.chunkIndex as number][action.nameIndex],
         }),
+      };
+    case "setPrize":
+      return {
+        ...state,
+        activePrize: action.prizeIndex,
       };
     default:
       return state;

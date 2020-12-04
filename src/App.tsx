@@ -96,7 +96,7 @@ const App = () => {
               if (chunkIndex < 0) {
                 chunkIndex = state.activeSegments.length - Math.abs(chunkIndex);
               }
-              console.log(selectedChunk.current, chunkIndex);
+              // console.log(selectedChunk.current, chunkIndex);
               dispatch({
                 type: "advance",
                 chunkIndex,
@@ -118,12 +118,12 @@ const App = () => {
               if (nameIndex < 0) {
                 nameIndex = state.activeSegments.length - Math.abs(nameIndex);
               }
-              console.log(selectedChunk.current, nameIndex);
+              // console.log(selectedChunk.current, nameIndex);
               dispatch({
                 type: "winner",
                 nameIndex,
               });
-              //   resetAnimation();
+              // resetAnimation();
             }}
           >
             select winner
@@ -157,6 +157,9 @@ const App = () => {
             <li
               key={idx}
               style={idx === state.activePrize ? { color: "red" } : undefined}
+              onClick={() => {
+                dispatch({ type: "setPrize", prizeIndex: idx });
+              }}
             >
               {p.label} {p.winner && `(${p.winner})`}{" "}
             </li>
