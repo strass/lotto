@@ -1,7 +1,7 @@
 import { ComponentProps, Reducer } from "react";
 import type Spinner from "./Spinner";
 import type data from "./service/data";
-import { chunk, first, last } from "lodash";
+import { chunk, first, last, set } from "lodash";
 
 export interface LottoState {
   prizes: Array<{ label: string; winner?: string }>;
@@ -9,13 +9,14 @@ export interface LottoState {
   chunks: typeof data[];
   activeSegments: ComponentProps<typeof Spinner>["segments"];
   activePrize: number;
-  root: boolean;
+  chunkIndex: false | number;
 }
 
-type Action = Record<string, unknown> & { type: string } & (
-    | { type: "init"; data: LottoState["data"]; chunkNum: number }
-    | { type: "advance"; chunkIndex: number }
-  );
+type Action = { type: string } & (
+  | { type: "init"; data: LottoState["data"]; chunkNum: number }
+  | { type: "advance"; chunkIndex: number }
+  | { type: "winner"; nameIndex: number }
+);
 
 const reducer: Reducer<LottoState, Action> = (state, action) => {
   switch (action.type) {
@@ -27,13 +28,21 @@ const reducer: Reducer<LottoState, Action> = (state, action) => {
         chunks,
         activeSegments: chunks.map((names) => `${first(names)}-${last(names)}`),
         activePrize: 0,
-        root: true,
+        chunkIndex: false,
       };
     case "advance":
       return {
         ...state,
         activeSegments: state.chunks[action.chunkIndex],
-        root: false,
+        chunkIndex: action.chunkIndex,
+      };
+    case "winner":
+      return {
+        ...state,
+        prizes: set(state.prizes, `[${state.activePrize}]`, {
+          ...state.prizes[state.activePrize],
+          winner: state.chunks[state.chunkIndex as number][action.nameIndex],
+        }),
       };
     default:
       return state;

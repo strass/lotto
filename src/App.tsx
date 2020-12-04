@@ -24,12 +24,17 @@ const radius = 500;
 const App = () => {
   const [spinning, setSpinActive] = useBoolean(false);
   const [state, dispatch] = useReducer(reducer, {
-    prizes: [],
+    prizes: [
+      { label: "$100" },
+      { label: "$200" },
+      { label: "$300" },
+      { label: "$400" },
+    ],
     data: [],
     chunks: [],
     activeSegments: [],
     activePrize: 0,
-    root: true,
+    chunkIndex: false,
   });
   useEffectOnce(() => {
     dispatch({ type: "init", data, chunkNum: 40 });
@@ -65,6 +70,9 @@ const App = () => {
     });
   }, [power, setSpinAnimation, setSpinActive]);
 
+  const resetAnimation = () =>
+    setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
+
   return (
     <div style={{ display: "flex" }}>
       <div>
@@ -76,12 +84,15 @@ const App = () => {
         >
           spin
         </button>
-        {state.root ? (
+        {state.chunkIndex === false ? (
           <button
             disabled={spinning}
             onClick={() => {
               let chunkIndex =
-                (selectedChunk.current - 18) % state.activeSegments.length;
+                (selectedChunk.current -
+                  // TODO: #1 figure out why this is 18 when chunknum is 40 and # datapoints is 1000
+                  18) %
+                state.activeSegments.length;
               if (chunkIndex < 0) {
                 chunkIndex = state.activeSegments.length - Math.abs(chunkIndex);
               }
@@ -90,23 +101,43 @@ const App = () => {
                 type: "advance",
                 chunkIndex,
               });
-              setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
+              resetAnimation();
             }}
           >
             advance
           </button>
         ) : (
-          <button>select winner</button>
+          <button
+            disabled={spinning}
+            onClick={() => {
+              let nameIndex =
+                (selectedChunk.current -
+                  // TODO: figure out why this is 29 for chunk size of 40
+                  29) %
+                state.activeSegments.length;
+              if (nameIndex < 0) {
+                nameIndex = state.activeSegments.length - Math.abs(nameIndex);
+              }
+              console.log(selectedChunk.current, nameIndex);
+              dispatch({
+                type: "winner",
+                nameIndex,
+              });
+              //   resetAnimation();
+            }}
+          >
+            select winner
+          </button>
         )}
         <button
           onClick={() => {
             dispatch({
               type: "init",
               chunkNum: 40,
-              // Do we need to remove winners?
+              // TODO: #2 Do we need to remove winners?
               data,
             });
-            setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
+            resetAnimation();
           }}
         >
           reset
@@ -122,10 +153,14 @@ const App = () => {
       <div>
         <h2>Prizes</h2>
         <ul>
-          <li>$100</li>
-          <li>$200</li>
-          <li>$300</li>
-          <li>$400</li>
+          {state.prizes.map((p, idx) => (
+            <li
+              key={idx}
+              style={idx === state.activePrize ? { color: "red" } : undefined}
+            >
+              {p.label} {p.winner && `(${p.winner})`}{" "}
+            </li>
+          ))}
         </ul>
       </div>
     </div>
