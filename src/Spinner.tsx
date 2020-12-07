@@ -1,5 +1,32 @@
-import React, { ComponentProps, FunctionComponent, useMemo } from "react";
+import { max, toNumber } from "lodash";
+import React, {
+  Dispatch,
+  Fragment,
+  FunctionComponent,
+  ReducerAction,
+  ReducerState,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { animated, useSpring } from "react-spring";
+import { useBoolean } from "react-use";
+import reducer from "./reducer";
+import data from "./service/data";
+
+const mapRotation = function (
+  value: number,
+  in_min: number,
+  in_max: number,
+  out_min: number,
+  out_max: number
+) {
+  if (value === 0) {
+    return out_min;
+  }
+  return ((value - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
+};
 
 const Segment: FunctionComponent<{
   r: number;
@@ -69,13 +96,58 @@ const Text: FunctionComponent<{
 const Spinner: FunctionComponent<{
   segments: string[];
   radius: number;
-  spinAnimation: ReturnType<typeof useSpring>[0];
-  rotation: number;
-  setSelectedChunk: ComponentProps<typeof Segment>["setSelectedChunk"];
-}> = ({ segments, radius: r, spinAnimation, rotation, setSelectedChunk }) => {
+  state: ReducerState<typeof reducer>;
+  dispatch: Dispatch<ReducerAction<typeof reducer>>;
+  data: typeof data;
+}> = ({ segments, radius: r, state, dispatch, data }) => {
+  const [spinning, setSpinActive] = useBoolean(false);
+  const [power, setPower] = useState(0);
+  const [rotation, setRotation] = useState(0);
+  const acc = useRef(0);
+  const selectedChunk = useRef(0);
+  const [spinAnimation, setSpinAnimation] = useSpring(() => ({
+    transform: "rotate(0deg)",
+    immediate: false,
+    onFrame({ transform }: { transform: string }) {
+      setRotation(toNumber(transform.slice(7, -4)));
+      acc.current = acc.current > 0.5 ? acc.current - 0.5 : 0;
+    },
+  }));
+
+  useEffect(() => {
+    const config = { mass: 50, tension: 200, friction: 200, precision: 0.001 };
+    setSpinAnimation({
+      from: {
+        transform: `rotate(${mapRotation(acc.current, 0, 100, 0, 1700)}deg)`,
+      },
+      transform: `rotate(${mapRotation(
+        acc.current + power,
+        0,
+        100,
+        0,
+        1700
+      )}deg)`,
+      onStart: () => {
+        acc.current = max([acc.current + power, 2]) ?? 2;
+        setSpinActive(true);
+      },
+      onRest: () => {
+        acc.current = 0;
+        setSpinActive(false);
+      },
+      immediate: false,
+      config,
+    });
+  }, [power, setSpinAnimation, setSpinActive]);
+
+  const resetAnimation = () =>
+    setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
+
   const cx = r;
   const cy = r;
   const { arcs, text } = useMemo<Record<"arcs" | "text", JSX.Element[]>>(() => {
+    const setSelectedChunk = (newValue: number) =>
+      (selectedChunk.current = newValue);
     const slices = segments.length;
     const test = segments.map((segmentTitle, idx) => {
       const fromAngle = (idx * 360) / slices;
@@ -119,19 +191,87 @@ const Spinner: FunctionComponent<{
         return text;
       }),
     };
-  }, [segments, cx, cy, r, rotation, setSelectedChunk]);
+  }, [segments, cx, cy, r, rotation]);
   return (
-    <svg width={r * 2} height={r * 2}>
-      <animated.g style={{ transformOrigin: "center", ...spinAnimation }}>
-        <circle cx={cx} cy={cy} r={r} stroke="black" fill="white" />
-        {arcs}
-        {text}
-      </animated.g>
-      <polygon
-        points="-20,0 20,0 0,40"
-        style={{ transform: "translateX(50%)" }}
-      />
-    </svg>
+    <Fragment>
+      <h1>Wheel</h1>
+      <button
+        onClick={() => {
+          setPower((p) => p + 2);
+        }}
+      >
+        spin
+      </button>
+      {state.chunkIndex === false ? (
+        <button
+          disabled={spinning}
+          onClick={() => {
+            let chunkIndex =
+              (selectedChunk.current -
+                // TODO: #1 figure out why this is 18 when chunknum is 40 and # datapoints is 1000
+                18) %
+              state.activeSegments.length;
+            if (chunkIndex < 0) {
+              chunkIndex = state.activeSegments.length - Math.abs(chunkIndex);
+            }
+            // console.log(selectedChunk.current, chunkIndex);
+            dispatch({
+              type: "advance",
+              chunkIndex,
+            });
+            resetAnimation();
+          }}
+        >
+          advance
+        </button>
+      ) : (
+        <button
+          disabled={spinning}
+          onClick={() => {
+            let nameIndex =
+              (selectedChunk.current -
+                // TODO: figure out why this is 29 for chunk size of 40
+                29) %
+              state.activeSegments.length;
+            if (nameIndex < 0) {
+              nameIndex = state.activeSegments.length - Math.abs(nameIndex);
+            }
+            // console.log(selectedChunk.current, nameIndex);
+            dispatch({
+              type: "winner",
+              nameIndex,
+            });
+            // resetAnimation();
+          }}
+        >
+          select winner
+        </button>
+      )}
+      <button
+        onClick={() => {
+          dispatch({
+            type: "init",
+            chunkNum: 40,
+            // TODO: #2 Do we need to remove winners?
+            data,
+          });
+          resetAnimation();
+        }}
+      >
+        reset
+      </button>
+      <svg width={r * 2} height={r * 2}>
+        <animated.g style={{ transformOrigin: "center", ...spinAnimation }}>
+          <circle cx={cx} cy={cy} r={r} stroke="black" fill="white" />
+          {arcs}
+          {text}
+        </animated.g>
+        <polygon
+          points="-20,0 20,0 0,40"
+          style={{ transform: "translateX(50%)" }}
+        />
+      </svg>
+    </Fragment>
   );
 };
 

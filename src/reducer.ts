@@ -28,7 +28,6 @@ const reducer: Reducer<LottoState, Action> = (state, action) => {
         data: action.data,
         chunks,
         activeSegments: chunks.map((names) => `${first(names)}-${last(names)}`),
-        activePrize: 0,
         chunkIndex: false,
       };
     case "advance":
