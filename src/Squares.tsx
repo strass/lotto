@@ -17,8 +17,8 @@ import {
 import { useBoolean } from "react-use";
 import data from "./service/data";
 
-const ROWS = 10;
-const COLUMNS = 5;
+const ROWS = 5;
+const COLUMNS = 10;
 
 const unstyleList = {
   display: "flex",
@@ -112,11 +112,11 @@ const Squares: FunctionComponent = () => {
                   <li
                     key={`${rId}-${cId}`}
                     style={{
-                      width: 100,
-                      height: 100,
+                      width: 60,
+                      height: 60,
                       outline: "1px solid black",
                       position: "relative",
-                      margin: 20,
+                      margin: 12,
                     }}
                   >
                     <Square running={running} idx={idx} />
