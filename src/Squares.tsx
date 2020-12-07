@@ -17,12 +17,14 @@ import {
 import { useBoolean } from "react-use";
 import data from "./service/data";
 
-const ROWS = 2;
+const ROWS = 10;
 const COLUMNS = 5;
 
 const unstyleList = {
   display: "flex",
   listStyle: "none",
+  margin: 0,
+  padding: 0,
 };
 
 const Square: FunctionComponent<{
@@ -41,13 +43,11 @@ const Square: FunctionComponent<{
     from: { transform: "translate3d(0,-40px,0)", opacity: 0 },
     enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
     leave: () => {
-      console.log("leave");
       if (running) {
         requestAnimationFrame(() => {
-          console.log("RAF");
           setTimeout(() => {
             setLabel(sample(data) ?? "ERROR");
-          }, 500);
+          }, 750);
         });
       }
       return { transform: "translate3d(0,40px,0)", opacity: 0 };
@@ -64,7 +64,11 @@ const Square: FunctionComponent<{
           (item || item === 0) && (
             <animated.div
               key={`${label}-${key}-${state}`}
-              style={{ ...props, position: "absolute" }}
+              style={{
+                ...props,
+                position: "absolute",
+                transition: "all cubic-bezier(.07,.78,.88,.24) 250ms",
+              }}
             >
               {item}
             </animated.div>
@@ -99,7 +103,7 @@ const Squares: FunctionComponent = () => {
       <ul style={{ ...unstyleList, flexDirection: "column", ...props }}>
         {times(ROWS, (rId) => (
           <li>
-            <ul>
+            <ul style={{ ...unstyleList, flexDirection: "row" }}>
               {times(COLUMNS, (cId) => {
                 const idx = rId * COLUMNS + cId;
                 // const label = idx + 1;
@@ -107,13 +111,13 @@ const Squares: FunctionComponent = () => {
                   <li
                     key={`${rId}-${cId}`}
                     style={{
-                      width: 50,
-                      height: 50,
+                      width: 100,
+                      height: 100,
                       outline: "1px solid black",
                       position: "relative",
+                      margin: 20,
                     }}
                   >
-                    {/* <span>{label}</span> */}
                     <Square running={running} idx={idx} />
                   </li>
                 );
