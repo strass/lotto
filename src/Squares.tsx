@@ -32,19 +32,25 @@ const Square: FunctionComponent<{
   idx: number;
 }> = ({ running, idx }) => {
   const [label, setLabel] = useState<ReactText>(`${idx}`);
+
   useEffect(() => {
     if (running) {
+      console.log("kickstart");
       setLabel(sample(data) ?? "ERROR");
     }
-  }, [running, idx, setLabel]);
+  }, [running]);
   const transitionRef = useRef<ReactSpringHook>(null);
-  const transitions = useTransition([label], (item) => item, {
+  const transitions = useTransition([label], null, {
     ref: transitionRef,
     from: () => {
       if (running) {
         requestAnimationFrame(() => {
           setTimeout(() => {
-            setLabel(sample(data) ?? "ERROR");
+            let newSample = sample(data) ?? "ERROR";
+            while (newSample === label) {
+              newSample = sample(data) ?? "ERROR";
+            }
+            setLabel(newSample);
           }, 500);
         });
       }
@@ -53,6 +59,7 @@ const Square: FunctionComponent<{
     enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
     leave: { transform: "translate3d(0,40px,0)", opacity: 0 },
     trail: 0,
+    unique: true,
     immediate: true,
   });
 
@@ -64,7 +71,7 @@ const Square: FunctionComponent<{
         ({ item, props, key, state }) =>
           (item || item === 0) && (
             <animated.div
-              key={`${label}-${key}-${state}`}
+              key={key}
               style={{
                 ...props,
                 position: "absolute",
