@@ -40,9 +40,7 @@ const Square: FunctionComponent<{
   const transitionRef = useRef<ReactSpringHook>(null);
   const transitions = useTransition([label], null, {
     ref: transitionRef,
-    from: { transform: "translate3d(0,-40px,0)", opacity: 0 },
-    enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
-    leave: () => {
+    from: () => {
       if (running) {
         requestAnimationFrame(() => {
           setTimeout(() => {
@@ -50,9 +48,12 @@ const Square: FunctionComponent<{
           }, 750);
         });
       }
-      return { transform: "translate3d(0,40px,0)", opacity: 0 };
+      return { transform: "translate3d(0,-40px,0)", opacity: 0 };
     },
+    enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
+    leave: { transform: "translate3d(0,40px,0)", opacity: 0 },
     trail: 0,
+    immediate: true,
   });
 
   useChain([transitionRef]);
