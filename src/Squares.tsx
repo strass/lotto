@@ -38,14 +38,14 @@ const Square: FunctionComponent<{
     }
   }, [running, idx, setLabel]);
   const transitionRef = useRef<ReactSpringHook>(null);
-  const transitions = useTransition([label], null, {
+  const transitions = useTransition([label], (item) => item, {
     ref: transitionRef,
     from: () => {
       if (running) {
         requestAnimationFrame(() => {
           setTimeout(() => {
             setLabel(sample(data) ?? "ERROR");
-          }, 750);
+          }, 500);
         });
       }
       return { transform: "translate3d(0,-40px,0)", opacity: 0 };
@@ -69,6 +69,7 @@ const Square: FunctionComponent<{
                 ...props,
                 position: "absolute",
                 transition: "all cubic-bezier(.07,.78,.88,.24) 250ms",
+                willChange: "transform, opacity",
               }}
             >
               {item}
