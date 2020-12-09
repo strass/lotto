@@ -252,10 +252,8 @@ const Spinner: FunctionComponent<{
       <button
         onClick={() => {
           dispatch({
-            type: "init",
+            type: "reset",
             chunkNum: 40,
-            // TODO: #2 Do we need to remove winners?
-            data: state.data,
           });
           resetAnimation();
         }}

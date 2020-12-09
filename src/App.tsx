@@ -9,15 +9,17 @@ const App = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      {state.activePrize === 0 ? (
-        <Squares dispatch={dispatch} />
-      ) : (
-        <Spinner
-          segments={state.activeSegments}
-          state={state}
-          dispatch={dispatch}
-        />
-      )}
+      <div style={{ flexBasis: "min-width" }}>
+        {state.activePrize === 0 ? (
+          <Squares dispatch={dispatch} />
+        ) : (
+          <Spinner
+            segments={state.activeSegments}
+            state={state}
+            dispatch={dispatch}
+          />
+        )}
+      </div>
 
       <div>
         <h2>Prizes</h2>

@@ -79,6 +79,7 @@ export const CsvContextProvider: FunctionComponent = ({ children }) => {
       { label: "$300" },
       { label: "$400" },
     ],
+    all: [],
     data: [],
     chunks: [],
     activeSegments: [],
@@ -121,7 +122,6 @@ export const CsvContextProvider: FunctionComponent = ({ children }) => {
           throw new Error("CSV loading or empty");
         }
       },
-      addWinner: (winner: CsvFields) => dispatch({ type: "winner", winner }),
     }),
     [state]
   );

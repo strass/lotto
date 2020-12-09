@@ -45,7 +45,7 @@ const Square: FunctionComponent<{
     from: { transform: "translate3d(0,-40px,0)", opacity: 0 },
     enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
     leave: { transform: "translate3d(0,40px,0)", opacity: 0 },
-    trail: 0,
+    trail: 25,
     unique: true,
     immediate: true,
   });
@@ -61,9 +61,9 @@ const Square: FunctionComponent<{
               key={key}
               style={{
                 ...props,
-                position: "absolute",
                 transition: "all cubic-bezier(.07,.78,.88,.24) 250ms",
                 willChange: "transform, opacity",
+                position: "absolute",
               }}
             >
               {item}
@@ -89,11 +89,13 @@ const Squares: FunctionComponent<{
 
   useEffect(() => {
     if (running) {
+      console.log("starting");
       intervalRef.current = setInterval(() => {
         set(dataSource.sample(COLUMNS * ROWS));
-      }, 500);
+      }, 750);
     }
     return () => {
+      console.log("clearing");
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
@@ -124,11 +126,14 @@ const Squares: FunctionComponent<{
                   <li
                     key={`${rId}-${cId}`}
                     style={{
-                      width: 60,
-                      height: 60,
+                      width: 100,
+                      height: 100,
                       outline: "1px solid black",
                       position: "relative",
                       margin: 12,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
                     <Square
