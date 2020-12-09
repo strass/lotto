@@ -17,6 +17,7 @@ import {
 import { useBoolean, useList } from "react-use";
 import reducer from "./reducer";
 import useCsvData, { CsvFields } from "./service/csv";
+import useStyles from "./styles.jss";
 
 const ROWS = 5;
 const COLUMNS = 10;
@@ -29,16 +30,8 @@ const unstyleList = {
 };
 
 const Square: FunctionComponent<{
-  running: boolean;
-  idx: number;
   label: string;
-}> = ({ running, idx, label }) => {
-  //   useEffect(() => {
-  //     if (running) {
-  //       console.log("kickstart");
-  //       setLabel(sample(data) ?? "ERROR");
-  //     }
-  //   }, [running]);
+}> = ({ label }) => {
   const transitionRef = useRef<ReactSpringHook>(null);
   const transitions = useTransition(label, null, {
     ref: transitionRef,
@@ -77,6 +70,7 @@ const Square: FunctionComponent<{
 const Squares: FunctionComponent<{
   dispatch: Dispatch<ReducerAction<typeof reducer>>;
 }> = ({ dispatch }) => {
+  const styles = useStyles();
   const dataSource = useCsvData();
   const [running, setRunning] = useBoolean(false);
   // Build a spring and catch its ref
@@ -123,23 +117,9 @@ const Squares: FunctionComponent<{
               {times(COLUMNS, (cId) => {
                 const idx = rId * COLUMNS + cId;
                 return (
-                  <li
-                    key={`${rId}-${cId}`}
-                    style={{
-                      width: 100,
-                      height: 100,
-                      outline: "1px solid black",
-                      position: "relative",
-                      margin: 12,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
+                  <li className={styles.square} key={`${rId}-${cId}`}>
                     <Square
-                      running={running}
-                      idx={idx}
-                      label={labels?.[idx]?.["account.username"]}
+                      label={labels?.[idx]?.["account.username"] ?? "?"}
                     />
                   </li>
                 );
