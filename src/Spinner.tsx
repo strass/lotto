@@ -96,6 +96,14 @@ const r = 500;
 const cx = r;
 const cy = r;
 
+const normalizeIndex = (current: number, offset: number, modulus: number) => {
+  let idx = (current + offset) % modulus;
+  if (idx < 0) {
+    idx = modulus - Math.abs(idx);
+  }
+  return idx;
+};
+
 const Spinner: FunctionComponent<{
   segments: string[];
   state: ReducerState<typeof reducer>;
@@ -193,8 +201,41 @@ const Spinner: FunctionComponent<{
   }, [segments, rotation]);
   return (
     <Fragment>
-      <h1>Wheel</h1>
+      <h1>
+        {state.chunkIndex === false ? (
+          <Fragment>
+            Level 1 ({selectedChunk.current}{" "}
+            {normalizeIndex(
+              selectedChunk.current,
+              -29,
+              state.activeSegments.length
+            )}{" "}
+            {normalizeIndex(
+              selectedChunk.current,
+              11,
+              state.activeSegments.length
+            )}
+            )
+          </Fragment>
+        ) : (
+          <Fragment>
+            Level 2 ({selectedChunk.current}{" "}
+            {normalizeIndex(
+              selectedChunk.current,
+              -22,
+              state.activeSegments.length
+            )}{" "}
+            {normalizeIndex(
+              selectedChunk.current,
+              8,
+              state.activeSegments.length
+            )}
+            )
+          </Fragment>
+        )}
+      </h1>
       <button
+        className="btn btn-primary"
         onClick={() => {
           setPower((p) => p + 2);
         }}
@@ -203,17 +244,15 @@ const Spinner: FunctionComponent<{
       </button>
       {state.chunkIndex === false ? (
         <button
+          className="btn btn-primary"
           disabled={spinning}
           onClick={() => {
-            let chunkIndex =
-              (selectedChunk.current -
-                // TODO: #1 figure out why this is 18 when chunknum is 40 and # datapoints is 1000
-                18) %
-              state.activeSegments.length;
-            if (chunkIndex < 0) {
-              chunkIndex = state.activeSegments.length - Math.abs(chunkIndex);
-            }
-            // console.log(selectedChunk.current, chunkIndex);
+            let chunkIndex = normalizeIndex(
+              selectedChunk.current,
+              -29,
+              state.activeSegments.length
+            );
+            console.log(selectedChunk.current, chunkIndex);
             dispatch({
               type: "advance",
               chunkIndex,
@@ -225,17 +264,15 @@ const Spinner: FunctionComponent<{
         </button>
       ) : (
         <button
+          className="btn btn-primary"
           disabled={spinning}
           onClick={() => {
-            let nameIndex =
-              (selectedChunk.current -
-                // TODO: figure out why this is 29 for chunk size of 40
-                29) %
-              state.activeSegments.length;
-            if (nameIndex < 0) {
-              nameIndex = state.activeSegments.length - Math.abs(nameIndex);
-            }
-            // console.log(selectedChunk.current, nameIndex);
+            let nameIndex = normalizeIndex(
+              selectedChunk.current,
+              8,
+              state.activeSegments.length
+            );
+            console.log(selectedChunk.current, nameIndex);
             if (!state.chunkIndex) {
               throw new Error("No chunk index found");
             }
@@ -250,6 +287,7 @@ const Spinner: FunctionComponent<{
         </button>
       )}
       <button
+        className="btn btn-primary"
         onClick={() => {
           dispatch({
             type: "reset",

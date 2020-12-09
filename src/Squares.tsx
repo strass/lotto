@@ -13,6 +13,7 @@ import {
   useChain,
   useSpring,
   useTransition,
+  config,
 } from "react-spring";
 import { useBoolean, useList } from "react-use";
 import reducer from "./reducer";
@@ -21,13 +22,6 @@ import useStyles from "./styles.jss";
 
 const ROWS = 5;
 const COLUMNS = 10;
-
-const unstyleList = {
-  display: "flex",
-  listStyle: "none",
-  margin: 0,
-  padding: 0,
-};
 
 const Square: FunctionComponent<{
   label: string;
@@ -41,7 +35,7 @@ const Square: FunctionComponent<{
     trail: 25,
     unique: true,
     immediate: false,
-    config: { precision: 0.1 },
+    config: { ...config.stiff, precision: 0.1 },
   });
 
   useChain([transitionRef]);
@@ -100,6 +94,7 @@ const Squares: FunctionComponent<{
     <Fragment>
       {running ? (
         <button
+          className="btn btn-primary"
           onClick={() => {
             setRunning(false);
             dispatch({ type: "winner", winner: labels });
@@ -108,12 +103,17 @@ const Squares: FunctionComponent<{
           select winners
         </button>
       ) : (
-        <button onClick={() => setRunning(true)}>start</button>
+        <button className="btn btn-primary" onClick={() => setRunning(true)}>
+          start
+        </button>
       )}
-      <ul style={{ ...unstyleList, flexDirection: "column", ...props }}>
+      <ul
+        className={styles.unstyleList}
+        style={{ flexDirection: "column", ...props }}
+      >
         {times(ROWS, (rId) => (
           <li>
-            <ul style={{ ...unstyleList, flexDirection: "row" }}>
+            <ul className={styles.unstyleList} style={{ flexDirection: "row" }}>
               {times(COLUMNS, (cId) => {
                 const idx = rId * COLUMNS + cId;
                 return (

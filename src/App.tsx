@@ -3,13 +3,15 @@ import React from "react";
 import useCsvData from "./service/csv";
 import Spinner from "./Spinner";
 import Squares from "./Squares";
+import useStyles from "./styles.jss";
 
 const App = () => {
+  const styles = useStyles();
   const { dispatch, ...state } = useCsvData();
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ flexBasis: "min-width" }}>
+      <div>
         {state.activePrize === 0 ? (
           <Squares dispatch={dispatch} />
         ) : (
@@ -23,11 +25,13 @@ const App = () => {
 
       <div>
         <h2>Prizes</h2>
-        <ul>
+        <ul className={styles.unstyleList}>
           {state.prizes.map((p, idx) => (
             <li key={idx}>
               <button
-                style={idx === state.activePrize ? { color: "red" } : undefined}
+                className={`btn btn-${
+                  idx !== state.activePrize ? "outline-" : ""
+                }primary`}
                 onClick={() => {
                   dispatch({ type: "setPrize", prizeIndex: idx });
                 }}

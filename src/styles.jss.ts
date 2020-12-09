@@ -2,7 +2,10 @@ import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
   "@global": {
-    html: { background: "skyblue", color: "#444" },
+    "html, body": { background: "skyblue", color: "#444" },
+    button: {
+      marginBottom: 8,
+    },
   },
   square: {
     background: "white",
@@ -16,6 +19,13 @@ const useStyles = createUseStyles({
     justifyContent: "center",
     alignItems: "center",
     boxShadow: "0 3px 6px rgba(68,68,68,0.16), 0 3px 6px rgba(68,68,68,0.23)",
+  },
+  unstyleList: {
+    display: "flex",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    flexDirection: "column",
   },
 });
 

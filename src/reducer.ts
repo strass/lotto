@@ -1,6 +1,6 @@
 import { ComponentProps, Reducer } from "react";
 import type Spinner from "./Spinner";
-import { chunk, first, isArray, last, set, without } from "lodash";
+import { first, isArray, last, set, without } from "lodash";
 import type { CsvFields } from "./service/csv";
 
 export interface LottoState {
@@ -21,10 +21,20 @@ type Action = { type: string } & (
   | { type: "setPrize"; prizeIndex: number }
 );
 
+function distribute<T>(input: T[], k: number) {
+  const subs = Array(k)
+    .fill(undefined)
+    .map(() => []) as T[][];
+  for (let i = 0; i < input.length; i++) {
+    subs[i % k].push(input[i]);
+  }
+  return subs;
+}
+
 const reducer: Reducer<LottoState, Action> = (state, action) => {
   switch (action.type) {
     case "init": {
-      const chunks = chunk(action.data, action.chunkNum);
+      const chunks = distribute(action.data, action.chunkNum);
       return {
         ...state,
         data: action.data,
@@ -40,7 +50,7 @@ const reducer: Reducer<LottoState, Action> = (state, action) => {
       };
     }
     case "reset": {
-      const chunks = chunk(state.data, action.chunkNum);
+      const chunks = distribute(state.data, action.chunkNum);
       return {
         ...state,
         activeSegments: chunks.map(
