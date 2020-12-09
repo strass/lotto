@@ -1,12 +1,5 @@
 import { range, sample, times } from "lodash";
-import {
-  Fragment,
-  FunctionComponent,
-  ReactText,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, FunctionComponent, useEffect, useRef } from "react";
 import {
   animated,
   ReactSpringHook,
