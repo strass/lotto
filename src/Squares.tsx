@@ -1,4 +1,4 @@
-import { sample, times } from "lodash";
+import { range, sample, times } from "lodash";
 import {
   Fragment,
   FunctionComponent,
@@ -14,7 +14,7 @@ import {
   useSpring,
   useTransition,
 } from "react-spring";
-import { useBoolean } from "react-use";
+import { useBoolean, useList } from "react-use";
 import data from "./service/data";
 
 const ROWS = 5;
@@ -30,32 +30,18 @@ const unstyleList = {
 const Square: FunctionComponent<{
   running: boolean;
   idx: number;
-}> = ({ running, idx }) => {
-  const [label, setLabel] = useState<ReactText>(`${idx}`);
-
-  useEffect(() => {
-    if (running) {
-      console.log("kickstart");
-      setLabel(sample(data) ?? "ERROR");
-    }
-  }, [running]);
+  label: string;
+}> = ({ running, idx, label }) => {
+  //   useEffect(() => {
+  //     if (running) {
+  //       console.log("kickstart");
+  //       setLabel(sample(data) ?? "ERROR");
+  //     }
+  //   }, [running]);
   const transitionRef = useRef<ReactSpringHook>(null);
   const transitions = useTransition([label], null, {
     ref: transitionRef,
-    from: () => {
-      if (running) {
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            let newSample = sample(data) ?? "ERROR";
-            while (newSample === label) {
-              newSample = sample(data) ?? "ERROR";
-            }
-            setLabel(newSample);
-          }, 500);
-        });
-      }
-      return { transform: "translate3d(0,-40px,0)", opacity: 0 };
-    },
+    from: { transform: "translate3d(0,-40px,0)", opacity: 0 },
     enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
     leave: { transform: "translate3d(0,40px,0)", opacity: 0 },
     trail: 0,
@@ -69,7 +55,7 @@ const Square: FunctionComponent<{
     <Fragment>
       {transitions.map(
         ({ item, props, key, state }) =>
-          (item || item === 0) && (
+          item && (
             <animated.div
               key={key}
               style={{
@@ -94,14 +80,22 @@ const Squares: FunctionComponent = () => {
   const props = useSpring({
     ref: springRef,
   });
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [labels, { set }] = useList(range(50).map(String));
 
-  // Build a transition and catch its ref
-  //   const transitionRef = useRef<ReactSpringHook>(null);
+  useEffect(() => {
+    if (running) {
+      intervalRef.current = setInterval(() => {
+        set(times(50, () => sample(data) ?? "err"));
+      }, 500);
+    }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [running, set]);
 
-  // First run the spring, when it concludes run the transition
-  //   useChain([springRef, transitionRef]);
-
-  // Use the animated props like always
   return (
     <Fragment>
       {running ? (
@@ -115,7 +109,6 @@ const Squares: FunctionComponent = () => {
             <ul style={{ ...unstyleList, flexDirection: "row" }}>
               {times(COLUMNS, (cId) => {
                 const idx = rId * COLUMNS + cId;
-                // const label = idx + 1;
                 return (
                   <li
                     key={`${rId}-${cId}`}
@@ -127,7 +120,7 @@ const Squares: FunctionComponent = () => {
                       margin: 12,
                     }}
                   >
-                    <Square running={running} idx={idx} />
+                    <Square running={running} idx={idx} label={labels[idx]} />
                   </li>
                 );
               })}
