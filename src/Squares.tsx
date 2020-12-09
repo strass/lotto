@@ -40,35 +40,35 @@ const Square: FunctionComponent<{
   //     }
   //   }, [running]);
   const transitionRef = useRef<ReactSpringHook>(null);
-  const transitions = useTransition([label], null, {
+  const transitions = useTransition(label, null, {
     ref: transitionRef,
-    from: { transform: "translate3d(0,-40px,0)", opacity: 0 },
-    enter: { transform: "translate3d(0,0px,0)", opacity: 1 },
-    leave: { transform: "translate3d(0,40px,0)", opacity: 0 },
+    from: { transform: "translateY(-40px)", opacity: 0.01 },
+    enter: { transform: "translateY(0px)", opacity: 1 },
+    leave: { transform: "translateY(40px)", opacity: 0 },
     trail: 25,
     unique: true,
-    immediate: true,
+    immediate: false,
+    config: { precision: 0.1 },
   });
 
   useChain([transitionRef]);
 
   return (
     <Fragment>
-      {transitions.map(
-        ({ item, props, key, state }) =>
-          item && (
-            <animated.div
-              key={key}
-              style={{
-                ...props,
-                transition: "all cubic-bezier(.07,.78,.88,.24) 250ms",
-                willChange: "transform, opacity",
-                position: "absolute",
-              }}
-            >
-              {item}
-            </animated.div>
-          )
+      {transitions.map(({ item, props, key, state }) =>
+        item && !!Number(props.opacity?.getValue()) ? (
+          <animated.div
+            key={key}
+            style={{
+              ...props,
+              transition: "all cubic-bezier(.07,.78,.88,.24) 250ms",
+              willChange: "transform, opacity",
+              position: "absolute",
+            }}
+          >
+            {item}
+          </animated.div>
+        ) : null
       )}
     </Fragment>
   );
