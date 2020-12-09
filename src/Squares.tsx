@@ -1,5 +1,12 @@
-import { range, sample, times } from "lodash";
-import { Fragment, FunctionComponent, useEffect, useRef } from "react";
+import { times } from "lodash";
+import {
+  Dispatch,
+  Fragment,
+  FunctionComponent,
+  ReducerAction,
+  useEffect,
+  useRef,
+} from "react";
 import {
   animated,
   ReactSpringHook,
@@ -8,7 +15,8 @@ import {
   useTransition,
 } from "react-spring";
 import { useBoolean, useList } from "react-use";
-import data from "./service/data";
+import reducer from "./reducer";
+import useCsvData, { CsvFields } from "./service/csv";
 
 const ROWS = 5;
 const COLUMNS = 10;
@@ -66,7 +74,10 @@ const Square: FunctionComponent<{
   );
 };
 
-const Squares: FunctionComponent = () => {
+const Squares: FunctionComponent<{
+  dispatch: Dispatch<ReducerAction<typeof reducer>>;
+}> = ({ dispatch }) => {
+  const dataSource = useCsvData();
   const [running, setRunning] = useBoolean(false);
   // Build a spring and catch its ref
   const springRef = useRef<ReactSpringHook>(null);
@@ -74,12 +85,12 @@ const Squares: FunctionComponent = () => {
     ref: springRef,
   });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [labels, { set }] = useList(range(50).map(String));
+  const [labels, { set }] = useList<CsvFields>();
 
   useEffect(() => {
     if (running) {
       intervalRef.current = setInterval(() => {
-        set(times(50, () => sample(data) ?? "err"));
+        set(dataSource.sample(COLUMNS * ROWS));
       }, 500);
     }
     return () => {
@@ -87,12 +98,19 @@ const Squares: FunctionComponent = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [running, set]);
+  }, [running, set, dataSource]);
 
   return (
     <Fragment>
       {running ? (
-        <button onClick={() => setRunning(false)}>stop</button>
+        <button
+          onClick={() => {
+            setRunning(false);
+            dispatch({ type: "winner", winner: labels });
+          }}
+        >
+          select winners
+        </button>
       ) : (
         <button onClick={() => setRunning(true)}>start</button>
       )}
@@ -113,7 +131,11 @@ const Squares: FunctionComponent = () => {
                       margin: 12,
                     }}
                   >
-                    <Square running={running} idx={idx} label={labels[idx]} />
+                    <Square
+                      running={running}
+                      idx={idx}
+                      label={labels?.[idx]?.["account.username"]}
+                    />
                   </li>
                 );
               })}

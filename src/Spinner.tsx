@@ -13,7 +13,6 @@ import React, {
 import { animated, useSpring } from "react-spring";
 import { useBoolean } from "react-use";
 import reducer from "./reducer";
-import data from "./service/data";
 
 const mapRotation = function (
   value: number,
@@ -93,13 +92,15 @@ const Text: FunctionComponent<{
   );
 };
 
+const r = 500;
+const cx = r;
+const cy = r;
+
 const Spinner: FunctionComponent<{
   segments: string[];
-  radius: number;
   state: ReducerState<typeof reducer>;
   dispatch: Dispatch<ReducerAction<typeof reducer>>;
-  data: typeof data;
-}> = ({ segments, radius: r, state, dispatch, data }) => {
+}> = ({ segments, state, dispatch }) => {
   const [spinning, setSpinActive] = useBoolean(false);
   const [power, setPower] = useState(0);
   const [rotation, setRotation] = useState(0);
@@ -143,8 +144,6 @@ const Spinner: FunctionComponent<{
   const resetAnimation = () =>
     setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
 
-  const cx = r;
-  const cy = r;
   const { arcs, text } = useMemo<Record<"arcs" | "text", JSX.Element[]>>(() => {
     const setSelectedChunk = (newValue: number) =>
       (selectedChunk.current = newValue);
@@ -191,7 +190,7 @@ const Spinner: FunctionComponent<{
         return text;
       }),
     };
-  }, [segments, cx, cy, r, rotation]);
+  }, [segments, rotation]);
   return (
     <Fragment>
       <h1>Wheel</h1>
@@ -237,9 +236,12 @@ const Spinner: FunctionComponent<{
               nameIndex = state.activeSegments.length - Math.abs(nameIndex);
             }
             // console.log(selectedChunk.current, nameIndex);
+            if (!state.chunkIndex) {
+              throw new Error("No chunk index found");
+            }
             dispatch({
               type: "winner",
-              nameIndex,
+              winner: state.chunks[state.chunkIndex][nameIndex],
             });
             // resetAnimation();
           }}
@@ -253,7 +255,7 @@ const Spinner: FunctionComponent<{
             type: "init",
             chunkNum: 40,
             // TODO: #2 Do we need to remove winners?
-            data,
+            data: state.data,
           });
           resetAnimation();
         }}

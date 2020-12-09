@@ -1,42 +1,21 @@
-import React, { useReducer } from "react";
-import { useEffectOnce } from "react-use";
-import reducer from "./reducer";
-import data from "./service/data";
+import { isArray } from "lodash";
+import React from "react";
+import useCsvData from "./service/csv";
 import Spinner from "./Spinner";
 import Squares from "./Squares";
 
-const radius = 500;
-
 const App = () => {
-  const [state, dispatch] = useReducer(reducer, {
-    prizes: [
-      { label: "50 x $50" },
-      { label: "$100" },
-      { label: "$200" },
-      { label: "$300" },
-      { label: "$400" },
-    ],
-    data: [],
-    chunks: [],
-    activeSegments: [],
-    activePrize: 0,
-    chunkIndex: false,
-  });
-  useEffectOnce(() => {
-    dispatch({ type: "init", data, chunkNum: 40 });
-  });
+  const { dispatch, ...state } = useCsvData();
 
   return (
     <div style={{ display: "flex" }}>
       {state.activePrize === 0 ? (
-        <Squares />
+        <Squares dispatch={dispatch} />
       ) : (
         <Spinner
           segments={state.activeSegments}
-          radius={radius}
           state={state}
           dispatch={dispatch}
-          data={data}
         />
       )}
 
@@ -51,7 +30,13 @@ const App = () => {
                   dispatch({ type: "setPrize", prizeIndex: idx });
                 }}
               >
-                {p.label} {p.winner && `(${p.winner})`}{" "}
+                {p.label}{" "}
+                {p.winner &&
+                  `(${
+                    isArray(p.winner)
+                      ? p.winner.map((w) => w.displayName).join(", ")
+                      : p.winner.displayName
+                  })`}{" "}
               </button>
             </li>
           ))}

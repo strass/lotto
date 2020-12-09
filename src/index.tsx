@@ -2,10 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { CsvContextProvider } from "./service/csv";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <CsvContextProvider>
+      <App />
+    </CsvContextProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
