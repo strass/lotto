@@ -2,7 +2,7 @@ import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
   "@global": {
-    "html, body": { background: "skyblue", color: "#061D49" },
+    "html, body": { color: "#061D49" },
     button: {
       marginBottom: 8,
     },
@@ -27,8 +27,24 @@ const useStyles = createUseStyles({
     padding: 0,
     flexDirection: "column",
   },
-  logo: {
+  horizontalList: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  header: {
+    background: "#071d49",
     textAlign: "center",
+    color: "#99b7ff",
+    padding: [8, 24],
+    fontSize: 25,
+    lineHeight: "25px",
+    "& > div": {
+      justifyContent: "space-between",
+    },
+  },
+  row: {
+    display: "flex",
+    flexDirection: "row",
   },
 });
 

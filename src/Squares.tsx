@@ -93,8 +93,8 @@ const Squares: FunctionComponent<{
   return (
     <Fragment>
       <ul
-        className={styles.unstyleList}
-        style={{ flexDirection: "column", ...props }}
+        className={`mx-auto ${styles.unstyleList}`}
+        style={{ flexDirection: "column", width: "fit-content", ...props }}
       >
         {times(ROWS, (rId) => (
           <li>

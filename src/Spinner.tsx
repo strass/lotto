@@ -5,6 +5,7 @@ import React, {
   FunctionComponent,
   ReducerAction,
   ReducerState,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -76,29 +77,19 @@ const Text: FunctionComponent<{
   label: string;
   idx: number;
   totalSegments: number;
-}> = ({
-  r,
-  fromAngle: _fromAngle,
-  toAngle: _toAngle,
-  label,
-  idx,
-  totalSegments,
-}) => {
-  if (idx === 0) {
-    console.log(_fromAngle, _toAngle, totalSegments);
-  }
-  const fromAngle = _fromAngle + 90 + (_fromAngle - _toAngle);
-  const toAngle = _toAngle + 90 + (_fromAngle - _toAngle);
+}> = ({ r, fromAngle, toAngle, label, idx, totalSegments }) => {
   return (
     <text
       y={r}
       x={r / 4}
       style={{
-        transform: `rotate(${toAngle}deg)`,
+        transform: `rotate(${
+          fromAngle - 180 + 360 / totalSegments / 2 - 1
+        }deg)`,
         transformOrigin: "center",
       }}
     >
-      {label} ({idx})
+      {label}
     </text>
   );
 };
@@ -106,14 +97,6 @@ const Text: FunctionComponent<{
 const r = 500;
 const cx = r;
 const cy = r;
-
-const normalizeIndex = (current: number, offset: number, modulus: number) => {
-  let idx = (current + offset) % modulus;
-  if (idx < 0) {
-    idx = modulus - Math.abs(idx);
-  }
-  return idx;
-};
 
 const Spinner: FunctionComponent<{
   segments: string[];
@@ -160,8 +143,16 @@ const Spinner: FunctionComponent<{
     });
   }, [power, setSpinAnimation, setSpinActive]);
 
-  const resetAnimation = () =>
-    setSpinAnimation({ transform: "rotate(0deg)", immediate: true });
+  const resetAnimation = useCallback(
+    () => setSpinAnimation({ transform: "rotate(0deg)", immediate: true }),
+    [setSpinAnimation]
+  );
+
+  useEffect(() => {
+    if (state.activePrize) {
+      resetAnimation();
+    }
+  }, [state.activePrize, resetAnimation]);
 
   const { arcs, text } = useMemo<Record<"arcs" | "text", JSX.Element[]>>(() => {
     const setSelectedChunk = (newValue: number) =>
@@ -213,45 +204,14 @@ const Spinner: FunctionComponent<{
   }, [segments, rotation, state.activeSegments.length]);
   return (
     <Fragment>
-      <h1>
-        {state.chunkIndex === false ? (
-          <Fragment>
-            ({selectedChunk.current}{" "}
-            {normalizeIndex(
-              selectedChunk.current,
-              -30,
-              state.activeSegments.length
-            )}{" "}
-            {normalizeIndex(
-              selectedChunk.current,
-              10,
-              state.activeSegments.length
-            )}
-            )
-          </Fragment>
-        ) : (
-          <Fragment>
-            ({selectedChunk.current}{" "}
-            {normalizeIndex(
-              selectedChunk.current,
-              -22,
-              state.activeSegments.length
-            )}{" "}
-            {normalizeIndex(
-              selectedChunk.current,
-              8,
-              state.activeSegments.length
-            )}
-            )
-          </Fragment>
-        )}
-      </h1>
-      <svg width={r * 2} height={r * 2}>
-        <animated.g style={{ transformOrigin: "center", ...spinAnimation }}>
-          <circle cx={cx} cy={cy} r={r} stroke="black" fill="white" />
-          {arcs}
-          {text}
-        </animated.g>
+      <svg width={r * 2} height={r * 2} style={{ marginTop: 12 }}>
+        <g style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}>
+          <animated.g style={{ transformOrigin: "center", ...spinAnimation }}>
+            <circle cx={cx} cy={cy} r={r} stroke="black" fill="white" />
+            {arcs}
+            {text}
+          </animated.g>
+        </g>
         <polygon
           points="-20,0 20,0 0,40"
           style={{ transform: "translateX(50%)" }}
@@ -277,11 +237,7 @@ const Spinner: FunctionComponent<{
             className="btn btn-primary"
             disabled={spinning}
             onClick={() => {
-              let chunkIndex = normalizeIndex(
-                selectedChunk.current,
-                -30,
-                state.activeSegments.length
-              );
+              const chunkIndex = selectedChunk.current;
               console.log(selectedChunk.current, chunkIndex);
               dispatch({
                 type: "advance",
@@ -297,13 +253,9 @@ const Spinner: FunctionComponent<{
             className="btn btn-primary"
             disabled={spinning}
             onClick={() => {
-              let nameIndex = normalizeIndex(
-                selectedChunk.current,
-                8,
-                state.activeSegments.length
-              );
+              const nameIndex = selectedChunk.current;
               console.log(selectedChunk.current, nameIndex);
-              if (!state.chunkIndex) {
+              if (!state.chunkIndex && state.chunkIndex !== 0) {
                 throw new Error("No chunk index found");
               }
               console.log(state.chunks[state.chunkIndex][nameIndex]);
