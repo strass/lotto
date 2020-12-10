@@ -66,7 +66,7 @@ const reducer: Reducer<LottoState, Action> = (state, action) => {
       return {
         ...state,
         activeSegments: state.chunks[action.chunkIndex].map(
-          (n) => n["account.username"]
+          (n) => n["displayName"]
         ),
         chunkIndex: action.chunkIndex,
       };

@@ -46,8 +46,8 @@ const Segment: FunctionComponent<{
   setSelectedChunk,
   index,
 }) => {
-  const fromAngle = _fromAngle + 90;
-  const toAngle = _toAngle + 90;
+  const fromAngle = _fromAngle;
+  const toAngle = _toAngle;
   const correctedFromAngle = (fromAngle + currentRotation) % 360;
   const correctedToAngle = (toAngle + currentRotation) % 360;
   const selected =
@@ -75,7 +75,18 @@ const Text: FunctionComponent<{
   toAngle: number;
   label: string;
   idx: number;
-}> = ({ r, fromAngle: _fromAngle, toAngle: _toAngle, label, idx }) => {
+  totalSegments: number;
+}> = ({
+  r,
+  fromAngle: _fromAngle,
+  toAngle: _toAngle,
+  label,
+  idx,
+  totalSegments,
+}) => {
+  if (idx === 0) {
+    console.log(_fromAngle, _toAngle, totalSegments);
+  }
   const fromAngle = _fromAngle + 90 + (_fromAngle - _toAngle);
   const toAngle = _toAngle + 90 + (_fromAngle - _toAngle);
   return (
@@ -83,7 +94,7 @@ const Text: FunctionComponent<{
       y={r}
       x={r / 4}
       style={{
-        transform: `rotate(${fromAngle + 12}deg)`,
+        transform: `rotate(${toAngle}deg)`,
         transformOrigin: "center",
       }}
     >
@@ -186,6 +197,7 @@ const Spinner: FunctionComponent<{
             fromAngle={fromAngle}
             toAngle={toAngle}
             label={segmentTitle}
+            totalSegments={state.activeSegments.length}
           />
         ),
       };
@@ -198,7 +210,7 @@ const Spinner: FunctionComponent<{
         return text;
       }),
     };
-  }, [segments, rotation]);
+  }, [segments, rotation, state.activeSegments.length]);
   return (
     <Fragment>
       <h1>
@@ -207,12 +219,12 @@ const Spinner: FunctionComponent<{
             ({selectedChunk.current}{" "}
             {normalizeIndex(
               selectedChunk.current,
-              -29,
+              -30,
               state.activeSegments.length
             )}{" "}
             {normalizeIndex(
               selectedChunk.current,
-              11,
+              10,
               state.activeSegments.length
             )}
             )
@@ -222,12 +234,12 @@ const Spinner: FunctionComponent<{
             ({selectedChunk.current}{" "}
             {normalizeIndex(
               selectedChunk.current,
-              -21,
+              -22,
               state.activeSegments.length
             )}{" "}
             {normalizeIndex(
               selectedChunk.current,
-              9,
+              8,
               state.activeSegments.length
             )}
             )
@@ -267,7 +279,7 @@ const Spinner: FunctionComponent<{
             onClick={() => {
               let chunkIndex = normalizeIndex(
                 selectedChunk.current,
-                -29,
+                -30,
                 state.activeSegments.length
               );
               console.log(selectedChunk.current, chunkIndex);
@@ -287,7 +299,7 @@ const Spinner: FunctionComponent<{
             onClick={() => {
               let nameIndex = normalizeIndex(
                 selectedChunk.current,
-                9,
+                8,
                 state.activeSegments.length
               );
               console.log(selectedChunk.current, nameIndex);
