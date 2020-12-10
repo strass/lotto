@@ -92,21 +92,6 @@ const Squares: FunctionComponent<{
 
   return (
     <Fragment>
-      {running ? (
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            setRunning(false);
-            dispatch({ type: "winner", winner: labels });
-          }}
-        >
-          select winners
-        </button>
-      ) : (
-        <button className="btn btn-primary" onClick={() => setRunning(true)}>
-          start
-        </button>
-      )}
       <ul
         className={styles.unstyleList}
         style={{ flexDirection: "column", ...props }}
@@ -128,6 +113,26 @@ const Squares: FunctionComponent<{
           </li>
         ))}
       </ul>
+      <div className="d-grid gap-2 col-6 mx-auto">
+        {running ? (
+          <button
+            className="btn btn-primary btn-large"
+            onClick={() => {
+              setRunning(false);
+              dispatch({ type: "winner", winner: labels });
+            }}
+          >
+            Select winners!
+          </button>
+        ) : (
+          <button
+            className="btn btn-primary btn-large"
+            onClick={() => setRunning(true)}
+          >
+            Start
+          </button>
+        )}
+      </div>
     </Fragment>
   );
 };

@@ -76,14 +76,14 @@ const Text: FunctionComponent<{
   label: string;
   idx: number;
 }> = ({ r, fromAngle: _fromAngle, toAngle: _toAngle, label, idx }) => {
-  const fromAngle = _fromAngle + 90;
-  const toAngle = _toAngle + 90;
+  const fromAngle = _fromAngle + 90 + (_fromAngle - _toAngle);
+  const toAngle = _toAngle + 90 + (_fromAngle - _toAngle);
   return (
     <text
       y={r}
       x={r / 4}
       style={{
-        transform: `rotate(${(fromAngle + toAngle) / 2 - 12}deg)`,
+        transform: `rotate(${fromAngle + 12}deg)`,
         transformOrigin: "center",
       }}
     >
@@ -204,7 +204,7 @@ const Spinner: FunctionComponent<{
       <h1>
         {state.chunkIndex === false ? (
           <Fragment>
-            Level 1 ({selectedChunk.current}{" "}
+            ({selectedChunk.current}{" "}
             {normalizeIndex(
               selectedChunk.current,
               -29,
@@ -219,85 +219,21 @@ const Spinner: FunctionComponent<{
           </Fragment>
         ) : (
           <Fragment>
-            Level 2 ({selectedChunk.current}{" "}
+            ({selectedChunk.current}{" "}
             {normalizeIndex(
               selectedChunk.current,
-              -22,
+              -21,
               state.activeSegments.length
             )}{" "}
             {normalizeIndex(
               selectedChunk.current,
-              8,
+              9,
               state.activeSegments.length
             )}
             )
           </Fragment>
         )}
       </h1>
-      <button
-        className="btn btn-primary"
-        onClick={() => {
-          setPower((p) => p + 2);
-        }}
-      >
-        spin
-      </button>
-      {state.chunkIndex === false ? (
-        <button
-          className="btn btn-primary"
-          disabled={spinning}
-          onClick={() => {
-            let chunkIndex = normalizeIndex(
-              selectedChunk.current,
-              -29,
-              state.activeSegments.length
-            );
-            console.log(selectedChunk.current, chunkIndex);
-            dispatch({
-              type: "advance",
-              chunkIndex,
-            });
-            resetAnimation();
-          }}
-        >
-          advance
-        </button>
-      ) : (
-        <button
-          className="btn btn-primary"
-          disabled={spinning}
-          onClick={() => {
-            let nameIndex = normalizeIndex(
-              selectedChunk.current,
-              8,
-              state.activeSegments.length
-            );
-            console.log(selectedChunk.current, nameIndex);
-            if (!state.chunkIndex) {
-              throw new Error("No chunk index found");
-            }
-            dispatch({
-              type: "winner",
-              winner: state.chunks[state.chunkIndex][nameIndex],
-            });
-            // resetAnimation();
-          }}
-        >
-          select winner
-        </button>
-      )}
-      <button
-        className="btn btn-primary"
-        onClick={() => {
-          dispatch({
-            type: "reset",
-            chunkNum: 40,
-          });
-          resetAnimation();
-        }}
-      >
-        reset
-      </button>
       <svg width={r * 2} height={r * 2}>
         <animated.g style={{ transformOrigin: "center", ...spinAnimation }}>
           <circle cx={cx} cy={cy} r={r} stroke="black" fill="white" />
@@ -309,6 +245,79 @@ const Spinner: FunctionComponent<{
           style={{ transform: "translateX(50%)" }}
         />
       </svg>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          marginTop: 12,
+        }}
+      >
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setPower((p) => p + 2);
+          }}
+        >
+          spin
+        </button>
+        {state.chunkIndex === false ? (
+          <button
+            className="btn btn-primary"
+            disabled={spinning}
+            onClick={() => {
+              let chunkIndex = normalizeIndex(
+                selectedChunk.current,
+                -29,
+                state.activeSegments.length
+              );
+              console.log(selectedChunk.current, chunkIndex);
+              dispatch({
+                type: "advance",
+                chunkIndex,
+              });
+              resetAnimation();
+            }}
+          >
+            advance
+          </button>
+        ) : (
+          <button
+            className="btn btn-primary"
+            disabled={spinning}
+            onClick={() => {
+              let nameIndex = normalizeIndex(
+                selectedChunk.current,
+                9,
+                state.activeSegments.length
+              );
+              console.log(selectedChunk.current, nameIndex);
+              if (!state.chunkIndex) {
+                throw new Error("No chunk index found");
+              }
+              console.log(state.chunks[state.chunkIndex][nameIndex]);
+              dispatch({
+                type: "winner",
+                winner: state.chunks[state.chunkIndex][nameIndex],
+              });
+              // resetAnimation();
+            }}
+          >
+            Select winner!
+          </button>
+        )}
+        <button
+          className="btn btn-outline-danger"
+          onClick={() => {
+            dispatch({
+              type: "reset",
+              chunkNum: 40,
+            });
+            resetAnimation();
+          }}
+        >
+          reset
+        </button>
+      </div>
     </Fragment>
   );
 };
