@@ -75,9 +75,9 @@ export const CsvContextProvider: FunctionComponent = ({ children }) => {
     prizes: [
       { label: "50 x $50" },
       { label: "$100" },
+      { label: "$150" },
       { label: "$200" },
-      { label: "$300" },
-      { label: "$400" },
+      { label: "$250" },
     ],
     all: [],
     data: [],
