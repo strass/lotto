@@ -204,7 +204,12 @@ const Spinner: FunctionComponent<{
   }, [segments, rotation, state.activeSegments.length]);
   return (
     <Fragment>
-      <svg width={r * 2} height={r * 2} style={{ marginTop: 12 }}>
+      <svg
+        width={r * 2}
+        height={r * 2}
+        style={{ marginTop: 12 }}
+        className="mx-auto"
+      >
         <g style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}>
           <animated.g style={{ transformOrigin: "center", ...spinAnimation }}>
             <circle cx={cx} cy={cy} r={r} stroke="black" fill="white" />

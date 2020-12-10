@@ -35,7 +35,7 @@ const useStyles = createUseStyles({
     background: "#071d49",
     textAlign: "center",
     color: "#99b7ff",
-    padding: [8, 24],
+    padding: [12, 24],
     fontSize: 25,
     lineHeight: "25px",
     "& > div": {

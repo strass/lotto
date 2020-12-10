@@ -23,7 +23,10 @@ const App = () => {
         </div>
       </header>
       <div style={{ display: "flex" }}>
-        <div style={{ flexBasis: "67%" }}>
+        <div
+          style={{ flexBasis: "67%", display: "flex", flexDirection: "column" }}
+          className="mx-auto"
+        >
           {state.activePrize === 0 ? (
             <Squares dispatch={dispatch} />
           ) : (
