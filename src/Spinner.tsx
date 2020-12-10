@@ -1,4 +1,5 @@
 import { max, toNumber } from "lodash";
+import { tint } from "polished";
 import React, {
   Dispatch,
   Fragment,
@@ -65,7 +66,11 @@ const Segment: FunctionComponent<{
       strokeWidth="1px"
       style={{
         transition: "fill 0.2s",
-        fill: selected ? "gold" : "palegoldenrod",
+        fill: selected
+          ? "gold"
+          : index % 2 === 1
+          ? tint(0.9, "gold")
+          : tint(0.7, "blue"),
       }}
     />
   );
@@ -90,11 +95,12 @@ const Text: FunctionComponent<{
       }}
     >
       {label}
+      {process.env.NODE_ENV === "development" ? ` (${idx})` : null}
     </text>
   );
 };
 
-const r = 500;
+const r = 450;
 const cx = r;
 const cy = r;
 
@@ -204,6 +210,10 @@ const Spinner: FunctionComponent<{
   }, [segments, rotation, state.activeSegments.length]);
   return (
     <Fragment>
+      {process.env.NODE_ENV === "development"
+        ? ` (${selectedChunk.current})`
+        : null}
+
       <svg
         width={r * 2}
         height={r * 2}
@@ -268,7 +278,6 @@ const Spinner: FunctionComponent<{
                 type: "winner",
                 winner: state.chunks[state.chunkIndex][nameIndex],
               });
-              // resetAnimation();
             }}
           >
             Select winner!

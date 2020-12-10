@@ -12,7 +12,7 @@ import {
   useMemo,
   useReducer,
 } from "react";
-import rawCsv from "../data/2020-12-09-test.csv";
+import rawCsv from "../data";
 import reducer from "../reducer";
 
 export type CsvFields = Record<
