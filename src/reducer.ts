@@ -59,6 +59,7 @@ const reducer: Reducer<LottoState, Action> = (state, action) => {
               last(names)?.["account.username"]
             }`
         ),
+        chunks,
         chunkIndex: false,
       };
     }

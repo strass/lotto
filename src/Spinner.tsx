@@ -100,7 +100,7 @@ const Text: FunctionComponent<{
   );
 };
 
-const r = 450;
+const r = 425;
 const cx = r;
 const cy = r;
 
